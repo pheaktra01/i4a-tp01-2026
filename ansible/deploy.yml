@@ -1,0 +1,46 @@
+---
+- name: Deploy Laravel App
+  hosts: web
+  become: yes
+
+  tasks:
+    - name: Ensure target directory exists
+      file:
+        path: /var/www/html/pheaktra
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Copy project from Jenkins workspace to server
+      synchronize:
+        src: "{{ workspace }}/"
+        dest: /var/www/html/pheaktra/
+        delete: yes
+        recursive: yes
+
+    - name: Install PHP dependencies
+      command: composer install
+      args:
+        chdir: /var/www/html/pheaktra
+
+    - name: Copy .env
+      copy:
+        src: /var/www/html/pheaktra/.env.example
+        dest: /var/www/html/pheaktra/.env
+        remote_src: yes
+
+    - name: Generate Laravel key
+      command: php artisan key:generate
+      args:
+        chdir: /var/www/html/pheaktra
+
+    - name: Install npm dependencies
+      command: npm install
+      args:
+        chdir: /var/www/html/pheaktra
+
+    - name: Build frontend
+      command: npm run build
+      args:
+        chdir: /var/www/html/pheaktra
