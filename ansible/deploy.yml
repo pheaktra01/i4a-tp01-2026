@@ -1,5 +1,5 @@
 - name: Deploy Laravel App
-  hosts: web
+  hosts: production
   become: yes
 
   tasks:
