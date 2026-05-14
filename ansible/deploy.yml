@@ -17,16 +17,10 @@
           - "--exclude=node_modules"
 
     - name: Install Composer dependencies
-      command: composer install
-      args:
-        chdir: /var/www/html/pheaktra
+      raw: cd /var/www/html/pheaktra && composer install
 
     - name: Generate Laravel key
-      command: php artisan key:generate
-      args:
-        chdir: /var/www/html/pheaktra
+      raw: cd /var/www/html/pheaktra && php artisan key:generate
 
     - name: Run migrations
-      command: php artisan migrate --force
-      args:
-        chdir: /var/www/html/pheaktra
+      raw: cd /var/www/html/pheaktra && php artisan migrate --force
