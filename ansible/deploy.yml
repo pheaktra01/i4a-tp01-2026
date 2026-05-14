@@ -4,6 +4,9 @@
   gather_facts: no
 
   tasks:
+    - name: Bootstrap remote Python dependencies
+      raw: apt-get update -y && apt-get install -y python3-six rsync
+
     - name: Sync project to server
       synchronize:
         src: "{{ workspace }}/"
