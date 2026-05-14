@@ -78,7 +78,7 @@ pipeline {
             steps {
                 sh '''
                     ansible-playbook -i ansible/inventory/hosts.ini ansible/deploy.yml \
-                    --extra-vars "workspace=$WORKSPACE"
+                    --extra-vars "workspace='/home/jenkins/workspace/Laravel TP03'"
                 '''
             }
         }

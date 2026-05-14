@@ -3,44 +3,49 @@
   hosts: web
   become: yes
 
-  tasks:
-    - name: Ensure target directory exists
-      file:
-        path: /var/www/html/pheaktra
-        state: directory
-        owner: root
-        group: root
-        mode: "0755"
+  vars:
+    app_path: /var/www/html/pheaktra
 
-    - name: Copy project from Jenkins workspace to server
+  tasks:
+
+    - name: Create project directory
+      file:
+        path: "{{ app_path }}"
+        state: directory
+        mode: '0755'
+
+    - name: Copy project from Jenkins workspace
       synchronize:
         src: "{{ workspace }}/"
-        dest: /var/www/html/pheaktra/
+        dest: "{{ app_path }}"
         delete: yes
-        recursive: yes
+        rsync_opts:
+          - "--exclude=node_modules"
+          - "--exclude=.git"
+          - "--exclude=vendor"
 
     - name: Install PHP dependencies
-      command: composer install
+      shell: composer install
       args:
-        chdir: /var/www/html/pheaktra
-
-    - name: Copy .env
-      copy:
-        src: /var/www/html/pheaktra/.env.example
-        dest: /var/www/html/pheaktra/.env
-        remote_src: yes
+        chdir: "{{ app_path }}"
 
     - name: Generate Laravel key
-      command: php artisan key:generate
+      shell: php artisan key:generate
       args:
-        chdir: /var/www/html/pheaktra
+        chdir: "{{ app_path }}"
+
+    - name: Run migrations
+      shell: php artisan migrate --force
+      args:
+        chdir: "{{ app_path }}"
+      ignore_errors: yes
 
     - name: Install npm dependencies
-      command: npm install
+      shell: npm install
       args:
-        chdir: /var/www/html/pheaktra
+        chdir: "{{ app_path }}"
 
-    - name: Build frontend
-      command: npm run build
+    - name: Build assets
+      shell: npm run build
       args:
-        chdir: /var/www/html/pheaktra
+        chdir: "{{ app_path }}"
