@@ -40,7 +40,7 @@
 // }
 
 pipeline {
-    agent { label 'agent1' }
+    agent any
 
     environment {
         ANSIBLE_HOST_KEY_CHECKING = 'False'
