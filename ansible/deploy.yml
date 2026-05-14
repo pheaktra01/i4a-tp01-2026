@@ -1,3 +1,42 @@
+---
+- name: Deploy Laravel App
+  hosts: web
+  become: yes
+  gather_facts: no
+
+  tasks:
+    - name: Archive project on control
+      delegate_to: localhost
+      archive:
+        path: "{{ workspace }}/"
+        dest: "/tmp/project-{{ inventory_hostname }}.tar.gz"
+        format: gz
+
+    - name: Copy archive to remote
+      copy:
+        src: "/tmp/project-{{ inventory_hostname }}.tar.gz"
+        dest: /tmp/project-{{ inventory_hostname }}.tar.gz
+
+    - name: Unarchive on remote
+      unarchive:
+        src: /tmp/project-{{ inventory_hostname }}.tar.gz
+        dest: /var/www/html/pheaktra/
+        remote_src: yes
+
+    - name: Remove remote archive
+      file:
+        path: /tmp/project-{{ inventory_hostname }}.tar.gz
+        state: absent
+
+    - name: Remove control archive
+      delegate_to: localhost
+      file:
+        path: "/tmp/project-{{ inventory_hostname }}.tar.gz"
+        state: absent
+
+    # NOTE: intentionally not running composer/php/artisan on the remote
+    # because this is not your server. Running dependency installs or
+    # migrations would modify the remote environment.
 - name: Deploy Laravel App
   hosts: web
   become: yes
