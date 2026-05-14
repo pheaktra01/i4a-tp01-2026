@@ -1,51 +1,27 @@
----
 - name: Deploy Laravel App
   hosts: web
   become: yes
 
-  vars:
-    app_path: /var/www/html/pheaktra
-
   tasks:
-
-    - name: Create project directory
-      file:
-        path: "{{ app_path }}"
-        state: directory
-        mode: '0755'
-
-    - name: Copy project from Jenkins workspace
-      synchronize:
+    - name: Copy project to server
+      copy:
         src: "{{ workspace }}/"
-        dest: "{{ app_path }}"
-        delete: yes
-        rsync_opts:
-          - "--exclude=node_modules"
-          - "--exclude=.git"
-          - "--exclude=vendor"
+        dest: /var/www/html/pheaktra/
+        owner: www-data
+        group: www-data
+        mode: 0755
 
-    - name: Install PHP dependencies
-      shell: composer install
+    - name: Install Composer dependencies
+      command: composer install
       args:
-        chdir: "{{ app_path }}"
+        chdir: /var/www/html/pheaktra
 
     - name: Generate Laravel key
-      shell: php artisan key:generate
+      command: php artisan key:generate
       args:
-        chdir: "{{ app_path }}"
+        chdir: /var/www/html/pheaktra
 
     - name: Run migrations
-      shell: php artisan migrate --force
+      command: php artisan migrate --force
       args:
-        chdir: "{{ app_path }}"
-      ignore_errors: yes
-
-    - name: Install npm dependencies
-      shell: npm install
-      args:
-        chdir: "{{ app_path }}"
-
-    - name: Build assets
-      shell: npm run build
-      args:
-        chdir: "{{ app_path }}"
+        chdir: /var/www/html/pheaktra
