@@ -85,7 +85,9 @@ pipeline {
         stage('Deploy with Ansible') {
             steps {
                 sh '''
-                    ANSIBLE_PYTHON_INTERPRETER=/usr/bin/python3 ansible-playbook -i ansible/hosts.ini ansible/deploy.yml --extra-vars "/home/jenkins/workspace/Laravel_TP03"
+                    ANSIBLE_PYTHON_INTERPRETER=/usr/bin/python3 \
+                    ansible-playbook -i ansible/hosts.ini ansible/deploy.yml \
+                    --extra-vars "workspace=$WORKSPACE"
                 '''
             }
         }
