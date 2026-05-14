@@ -10,9 +10,6 @@
         src: "{{ workspace }}/"
         dest: /var/www/html/pheaktra/
         delete: yes
-        rsync_opts:
-          - "--exclude=.git"
-          - "--exclude=node_modules"
 
     - name: Install Composer dependencies
       raw: cd /var/www/html/pheaktra && composer install
