@@ -5,7 +5,41 @@
 
   tasks:
     - name: Bootstrap remote Python dependencies
-      raw: apt-get update -y && apt-get install -y python3-six rsync
+      raw: |
+        set -e
+
+        # ensure rsync is present
+        if ! command -v rsync >/dev/null 2>&1; then
+          if [ -f /etc/debian_version ]; then
+            apt-get update -y
+            apt-get install -y rsync
+          elif command -v yum >/dev/null 2>&1; then
+            yum install -y epel-release || true
+            yum install -y rsync
+          else
+            echo "Unsupported distro: please install rsync manually" >&2
+            exit 1
+          fi
+        fi
+
+        # ensure Python 'six' package is available for Ansible module utils
+        if ! python3 -c "import six" >/dev/null 2>&1; then
+          if command -v pip3 >/dev/null 2>&1; then
+            pip3 install --upgrade six
+          else
+            if [ -f /etc/debian_version ]; then
+              apt-get update -y
+              apt-get install -y python3-pip
+              pip3 install --upgrade six
+            elif command -v yum >/dev/null 2>&1; then
+              yum install -y python3-pip || yum install -y python36-pip || true
+              pip3 install --upgrade six
+            else
+              echo "Unsupported distro: please install python3-pip and six manually" >&2
+              exit 1
+            fi
+          fi
+        fi
 
     - name: Sync project to server
       synchronize:
