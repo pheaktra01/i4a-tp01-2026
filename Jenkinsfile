@@ -68,6 +68,14 @@ pipeline {
             }
         }
 
+        stage('Debug Workspace') {
+            steps {
+                sh 'pwd'
+                sh 'ls -la'
+                sh 'echo $WORKSPACE'
+            }
+        }
+
         stage('Test') {
             steps {
                 sh 'php artisan test || true'
@@ -77,7 +85,7 @@ pipeline {
         stage('Deploy with Ansible') {
             steps {
                 sh '''
-                    ANSIBLE_PYTHON_INTERPRETER=/usr/bin/python3 ansible-playbook -i ansible/hosts.ini ansible/deploy.yml --extra-vars "workspace=/home/jenkins/workspace/Laravel_TP03"
+                    ANSIBLE_PYTHON_INTERPRETER=/usr/bin/python3 ansible-playbook -i ansible/hosts.ini ansible/deploy.yml --extra-vars "workspace=$WORKSPACE"
                 '''
             }
         }
