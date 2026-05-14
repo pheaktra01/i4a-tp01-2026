@@ -40,7 +40,7 @@
 // }
 
 pipeline {
-    agent { label 'laravel-agent' }
+    agent { label 'ageent1' }
 
     environment {
         ANSIBLE_HOST_KEY_CHECKING = 'False'
