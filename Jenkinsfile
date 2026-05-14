@@ -87,7 +87,7 @@ pipeline {
                 sh '''
                     set -e
 
-                    SAFE_WORKSPACE="${WORKSPACE// /_}"
+                    SAFE_WORKSPACE=$(printf '%s' "$WORKSPACE" | tr ' ' '_')
 
                     echo "WORKSPACE is: $WORKSPACE"
                     echo "SAFE_WORKSPACE is: $SAFE_WORKSPACE"
