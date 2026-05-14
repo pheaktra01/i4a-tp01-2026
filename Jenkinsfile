@@ -88,8 +88,9 @@ pipeline {
                     echo "WORKSPACE is: $WORKSPACE"
 
                     ANSIBLE_PYTHON_INTERPRETER=/usr/bin/python3 \
+                    ANSIBLE_REMOTE_TMP=/tmp \
                     ansible-playbook -i ansible/hosts.ini ansible/deploy.yml \
-                    --extra-vars 'workspace="$WORKSPACE"'
+                    --extra-vars "workspace=$WORKSPACE"
                 """
             }
         }
