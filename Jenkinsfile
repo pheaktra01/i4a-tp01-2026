@@ -77,7 +77,7 @@ pipeline {
         stage('Deploy with Ansible') {
             steps {
                 sh '''
-                    ansible-playbook deploy.yml --extra-vars "workspace=$WORKSPACE"
+                    ansible-playbook ansible/deploy.yml --extra-vars "workspace=$WORKSPACE"
                 '''
             }
         }
