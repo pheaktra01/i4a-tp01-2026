@@ -84,14 +84,21 @@ pipeline {
 
         stage('Deploy with Ansible') {
             steps {
-                sh """
+                sh '''
+                    set -e
+
+                    SAFE_WORKSPACE="${WORKSPACE// /_}"
+
                     echo "WORKSPACE is: $WORKSPACE"
+                    echo "SAFE_WORKSPACE is: $SAFE_WORKSPACE"
+
+                    ln -sfn "$WORKSPACE" "$SAFE_WORKSPACE"
 
                     ANSIBLE_PYTHON_INTERPRETER=/usr/bin/python3 \
                     ANSIBLE_REMOTE_TMP=/tmp \
                     ansible-playbook -i ansible/hosts.ini ansible/deploy.yml \
-                    --extra-vars "workspace=$WORKSPACE"
-                """
+                    --extra-vars "workspace=$SAFE_WORKSPACE"
+                '''
             }
         }
     }
